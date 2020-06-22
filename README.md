@@ -4,4 +4,5 @@ Our current project is based on margin calls, trades, disputes etc. Future predi
 Files created so far : 
 1) Dataset Generator - Creates a csv file containing a column for amount for different clients with datetime object as index
 2) Stationarity Checker - Checks whether the given time series is stationary or not by using Dickey-Fuller test, KPSS test and plotting graphs.
-3) Make Stationary - Converts non stationary data to stationary data by taking log transform and applying differencing
+3) Log Transform Differencing - Converts non stationary data to stationary data by taking log transform and applying differencing.
+4) Seasonal Decomposition - It takes into account the seasonality of the time series. It is decomposed into trend, seasonality, and residuals out of which residual is tested and that comes out to be closest to stationary.
