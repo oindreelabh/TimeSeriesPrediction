@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Future Prediction</title>
+	<link rel="stylesheet" type="text/css" href="../static/css/style.css">
+</head>
+<body>
+	<h1>Future Prediction</h1>
+	<hr>
+	<button onclick="location.href='../Resume/index.html';">Compare Two Clients</button>
+	<hr>
+	<div class="input">
+		<p>Please enter the details below :</p>
+		<form class="my-form" action="{{ url_for('output')}}" method="POST" target="output_frame">
+			<label>Client Name : </label>
+			<input type="text" name="cname">
+			<br> <br>
+			<label>Legal Entity Name : </label>
+			<input type="text" name="lename">
+			<br> <br>
+			<label>From : </label>
+			<input type="date" name="from">
+			<label>To : </label>
+			<input type="date" name="to">
+			<br> <br>
+			<input class="button" type="submit" name="submit" value="Submit">
+		</form>
+		<br><br>
+		<iframe name="output_frame" src="output.html" height=300px width=450px>
+			{{output_text}}
+		</iframe>
+		<br>
+
+	</div>
+	<div class="predict">
+		<form class="prediction" action="{{ url_for('predict')}}" method="POST" target="predict_frame">
+			<input class="button" type="submit" name="predict" value="Show future trend">
+		</form>
+		<br><br>
+		<iframe name="predict_frame" src="predict.html" height=300px width=450px>
+			{{prediction_text}}
+		</iframe>
+	</div>
+</body>
+</html>
