@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Compare Two Clients</title>
+</head>
+<body style="background-color: #DCDCDC;">
+    <div>
+    	<h1 style="text-align: center;">Compare Two Clients</h1> 
+    	<hr>
+    </div>
+    <div style="width:50%; margin-top: 3%; margin-left: 25%" >	
+
+	<form id = "myForm" name = "Details" action = "{{url_for('script')}}" method="POST">
+		<div  style='float:left'>
+		    <label>Client Name : </label>
+		    <input type ="text" name = "client1" required>
+		    <br><br>
+		    <label>Legal Entity Name : </label> 
+		    <input type ="text" name = "legal1" required>
+		</div>
+
+		<div  style='float:right'>
+			<label>Client Name : </label>
+			<input type ="text" name = "client2" required>
+			<br><br>
+			<label>Legal Entity Name : </label> 
+			<input type ="text" name = "legal2" required>
+		</div>
+
+		<br><br>
+
+		<div style=" margin-left : 25% ;" >
+			<br><br><br>
+			<label>From : </label>
+			<input type="date" name="from" required>
+			<label>To : </label>
+			<input type="date" name="to" required>
+			<br><br>
+			<input type="submit" value="Submit" required>
+		</div>
+	</form>
+    </div>
+    <hr>   
+
+</body>
+</html>
