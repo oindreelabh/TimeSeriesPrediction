@@ -7,3 +7,4 @@ Files created so far :
 3) Log Transform Differencing - Converts non stationary data to stationary data by taking log transform and applying differencing.
 4) Seasonal Decomposition - It takes into account the seasonality of the time series. It is decomposed into trend, seasonality, and residuals out of which residual is tested and that comes out to be closest to stationary.
 5) Weighted Moving Average - This method involves taking rolling average of past values in which more recent values are given higher weight. There are many methods of assigning weights , here we have used exponential weighted moving average method where weights are assigned to all values with a decay factor
+6) "project3" folder contains the flask app files to run this application.
