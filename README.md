@@ -3,9 +3,9 @@ Our current project is based on margin calls, trades, disputes etc. Future predi
 
 Technology Used :
 
-Model - Python 3 - pandas, plotly, numpy, statsmodels
+Model - Python 3 - pandas, plotly, numpy, statsmodels, datetime
 
-UI - Python Flask, HTML CSS
+UI - Python Flask, HTML CSS, JavaScript
 
 Files created so far :
 
