@@ -7,8 +7,6 @@ Model - Python 3 - pandas, plotly, numpy, statsmodels, datetime
 
 UI - Python Flask, HTML CSS, JavaScript
 
-Files created so far :
-
 DATASET GENERATION
 
  Dataset Generator - Creates a csv file containing a column for amount for different clients with datetime object as index
