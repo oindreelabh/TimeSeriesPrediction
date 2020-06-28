@@ -6,94 +6,123 @@ import plotly.io as pio
 from datetime import date
 import datetime
 from dateutil.relativedelta import relativedelta
-from model import model_call
+from model import model_call , predict_top_clients
 import pandas as pd
 from plotly.subplots import make_subplots
 import plotly.graph_objects as go
 import datetime
-import csv
+import numpy as np
+from helper_functions import give_last_date, take_fields, give_dates
 
-#import cufflinks as cf
-#cf.go_offline()
 
 
 app = Flask(__name__)
 
+print(',..............................................start......................................................')
 
 @app.route('/')
 @app.route('/home')
 def home():
-    return render_template('index.html')
-
+	listofatt=take_fields()
+	return render_template('index.html',listofatt=listofatt)
 
 
 @app.route("/compare")
 def compare():
-      return render_template('compare.html')
-
+	listofatt=take_fields()
+	return render_template('compare.html', listofatt=listofatt)
 
 
 @app.route('/predict',methods=['POST'])
 def predict():
-	fig = go.Figure()
 	cname = request.form['cname'];
 	lename = request.form['lename'];
 	from_d = request.form['from'];
+	attribute_value = request.form['attribute_value'];
+	
 	df = model_call(str(cname),str(lename))
-	start = from_d
-	fig.add_trace(go.Scatter(x = df[start:].index, y=df[start:], mode='lines', name='Recorded Trend'))
-
 	model = pickle.load(open('model.pkl', 'rb'))
-	with open("F:/project3_frontend/dataset.csv", 'r') as csvfile:
-		csvreader = csv.reader(csvfile)
-		fields=next(csvreader)
-		last_date =""
-		for row in csvreader:
-			if row[1]==cname and row[2]==lename :
-				last_date=row[0]
-	lastdate_=""
-	for w in last_date:
-		if w!='-':
-			lastdate_+=w
-	pred = model.predict(start=datetime.datetime.strptime(str(lastdate_), '%Y%m%d').date(), end=date.today() + relativedelta(months=+6))
-	#pred = model.predict(start=date.today(), end=date.today() + relativedelta(months=+6))
-	start=date.today()
-	fig.add_trace(go.Scatter(x=pred[start:].index, y=pred[start:], mode='lines', name='Predicted trend'))
-	pio.write_html(fig, file='F:/project3_frontend/templates/predict.html', auto_open=False)
+	lastdate_=give_last_date(cname, lename)
+	pred=model.forecast(6)
+	start = from_d
+	show_predict=np.array(df[str(datetime.datetime.strptime(str(lastdate_),'%Y%m%d').date())])
+	show_predict=np.append(show_predict, pred)
+	
+
+	fig = go.Figure()
+	fig.add_trace(go.Scatter(x = df[start:].index, y=df[start:], mode='lines', name='Recorded'))
+	fig.add_trace(go.Scatter(x=give_dates(lastdate_), y=show_predict, mode='lines', name='Predicted'))
+	positive_verdict='This is the graph for predicted values of 6 months from now. It is beneficial to work with this client'
+	negative_verdict='This is the graph for predicted values of 6 months from now. It is not beneficial to work with this client'
 	slope = pred[-1] - pred[0]
+	final_verdict=''
+	if slope>0:
+		final_verdict="Beneficial to work with this client"
+	else :
+		final_verdict="Not beneficial to work with this client"
+	fig.update_layout(title_text=final_verdict)
+	pio.write_html(fig, file='F:/project3_frontend/templates/predict.html', auto_open=False)
 	return render_template('predict.html')
-	output = "" if slope > 0 else "not "
-	return render_template('predict.html', prediction_text = 'This is the graph for predicted values of 6 months from now. It is {}beneficial to work with this client'.format(output))   
+	   
+
 
       
-
 @app.route("/script", methods = ["POST"])
 def script():
-      client1 = request.form['client1'];
-      client2 = request.form['client2'];
-      legal1 = request.form['legal1'];
-      legal2 = request.form['legal2'];
-      from_d = request.form['from'];
-      #to = request.form['to'];
-      #df1=[]
-      #df2=[]
-      df1 = model_call(str(client1),str(legal1))
-      df2 = model_call(str(client2),str(legal2))
-      #dataframe1= pd.DataFrame(df1)
-      #dataframe2 = pd.DataFrame(df2)
-      #temp_df={'A':df1 , 'B':df2}
-      #combined_df = pd.DataFrame(temp_df) 
-      #return render_template('test.html', df1=dataframe1, df2=dataframe2)
-      #return myfile.getAns(from_d)
-      start = from_d
-      #end  = to
-      #fig1 = px.line(x = df1[start:end].index, y = df1[start:end], title = 'Past trend')
-      #fig2 = px.line( x = df2[start:end].index,y = df2[start:end] , title='past trend')
-      fig = make_subplots(rows=1, cols=2)
-      fig.add_trace(go.Scatter(x = df1[start:].index, y = df1[start:], mode="lines"), row=1, col=1)
-      fig.add_trace(go.Scatter( x = df2[start:].index,y = df2[start:],mode="lines"), row=1, col=2)
-      pio.write_html(fig, file='F:/project3_frontend/templates/output.html', auto_open=False)
-      return render_template('output.html')
+	client1 = request.form['client1'];
+	client2 = request.form['client2'];
+	legal1 = request.form['legal1'];
+	legal2 = request.form['legal2'];
+	from_d = request.form['from'];
+	attribute_value = request.form['attribute_value'];
+	start = from_d
+
+	df1 = model_call(str(client1),str(legal1))
+	model = pickle.load(open('model.pkl', 'rb'))
+	lastdate_1=give_last_date(client1, legal1)
+	pred1=model.forecast(6)
+	show_predict1=np.array(df1[str(datetime.datetime.strptime(str(lastdate_1),'%Y%m%d').date())])
+	show_predict1=np.append(show_predict1, pred1)
+
+
+	df2 = model_call(str(client2),str(legal2))
+	model = pickle.load(open('model.pkl', 'rb'))
+	lastdate_2=give_last_date(client2, legal2)
+	pred2=model.forecast(6)
+	show_predict2=np.array(df2[str(datetime.datetime.strptime(str(lastdate_2),'%Y%m%d').date())])
+	show_predict2=np.append(show_predict2, pred2)
+	
+	
+	fig = make_subplots(rows=1, cols=2)
+	fig.add_trace(go.Scatter(x =df1[start:].index,y=df1[start:],mode='lines',name='Recorded trend 1'),row=1,col=1)
+	fig.add_trace(go.Scatter(x=give_dates(lastdate_1),y=show_predict1,mode='lines',name='Predicted trend 1'),row=1,col=1)
+	fig.add_trace(go.Scatter(x = df2[start:].index, y=df2[start:], mode='lines', name='Recorded Trend 2'),row=1,col=2)
+	fig.add_trace(go.Scatter(x=give_dates(lastdate_2), y=show_predict2, mode='lines', name='Predicted trend 2'),row=1,col=2)
+
+
+	pio.write_html(fig, file='F:/project3_frontend/templates/output.html', auto_open=False)
+	return render_template('output.html')
+
+
+@app.route("/topNClients.html",  methods = ["POST", "GET"])
+def topNClients() :
+	result = {}
+	if request.method == 'POST' :
+		lename = request.form['lename']
+		number = request.form['number']
+		result=predict_top_clients(int(number))
+		print(result)
+		print('....................post result..............................')
+		return render_template('topNClients.html', result=result)
+    
+	print(result)
+	print('....................result....................')
+
+	return render_template('topNClients.html', result=result)
+
+@app.route("/alter.html")
+def alter() :
+	return render_template('alter.html')
 
 
 

@@ -1,13 +1,64 @@
 import pandas as pd
 from statsmodels.tsa.holtwinters import ExponentialSmoothing
 import pickle
+import numpy as np 
+import pandas as pd 
 
 def model_call(client_name, le_name):
-    df = pd.read_csv(r"dataset.csv", parse_dates=['Date'], index_col='Date')
-    ts = df[(df['Client Name']==client_name)&(df['Legal Entity']==le_name)]['Net Amount']
-    model = ExponentialSmoothing(ts, trend='add', seasonal='add', seasonal_periods=12, damped=True)
-    hw_model = model.fit(optimized=True, use_boxcox=False, remove_bias=False)
-    pickle.dump(hw_model, open('model.pkl','wb'))
-    return ts
+    df = pd.read_csv(r'F:/Project3_frontend/processed_data.csv').set_index('Payment Date')
+    df = df[df['Client Name']==client_name]
+    train = df.iloc[:-10, :]
+    test = df.iloc[-10:, :]
+    pred = test.copy()
+    model = ExponentialSmoothing(np.asarray(train['Paid Amount']), trend="add", seasonal="add", seasonal_periods=12)
+    model2 = ExponentialSmoothing(np.asarray(train['Paid Amount']), trend="add", seasonal="add", seasonal_periods=12, damped=True)
+    fit = model.fit()
+    pred = fit.forecast(len(test))
+    fit2 = model2.fit()
+    pred2 = fit2.forecast(len(test))
+    if fit.aic < fit2.aic :
+    	pickle.dump(fit, open('model.pkl','wb'))
+    else :
+    	pickle.dump(fit2, open('model.pkl','wb'))
+    return df['Paid Amount']
 
 
+def get_key(val, my_dict):
+
+    for key, value in my_dict.items():
+        if val == value:
+            return key 
+
+    return "key doesn't exist"
+
+def predict_top_clients(num):
+    
+    df = pd.read_csv(r'F:/project3_frontend/processed_data.csv', parse_dates=['Payment Date'], index_col='Payment Date')
+
+    model_dict = {}
+
+    for client in df['Client Name'].unique():
+        model1 = ExponentialSmoothing(np.asarray(df[df['Client Name']==client]['Paid Amount']), trend='add', seasonal='add', seasonal_periods=12, damped=True)
+        hw_model1 = model1.fit()
+        model2 = ExponentialSmoothing(np.asarray(df[df['Client Name']==client]['Paid Amount']), trend='add', seasonal='add', seasonal_periods=12)
+        hw_model2 = model2.fit()
+        model_dict[client] = hw_model1 if hw_model1.aic < hw_model2.aic else hw_model2
+
+    predicted_amounts = {}
+
+    for client, model in model_dict.items():
+        pred = model.forecast(12)
+        predicted_amounts[client] = pred.mean()
+
+    values = list(predicted_amounts.values())
+    values.sort()
+    
+    result = {}
+
+    for i in range(1,num + 1):
+        result[get_key(values[-1*i],predicted_amounts)] = values[-1*i]
+
+    print(result)
+    print(',,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,')
+
+    return result
