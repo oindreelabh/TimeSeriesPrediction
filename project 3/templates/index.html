@@ -3,11 +3,33 @@
 <head>
 	<title>Future Prediction</title>
 	<link rel="stylesheet" type="text/css" href="../static/css/style.css">
+	<script type="text/javascript">
+		var reader = new XMLHttpRequest();
+	    var checkFor = "predict.html"; //Add the first link
+	    var second = "alter.html"; //Add the alternative
+
+	    reader.open('get', checkFor, true);
+	    reader.onreadystatechange = checkReadyState;
+
+	    function checkReadyState() {
+	        if (reader.readyState === 4) {
+	            if ((reader.status == 200) || (reader.status == 0)) {
+	            document.getElementById('site').src =  checkFor;
+	            }
+	            else {
+	           document.getElementById('site').src = second;
+	            return;
+	            }
+	        }
+	    }
+	    reader.send(null);
+	</script>
 </head>
 <body>
 	<h1>Future Prediction</h1>
 	<hr>
 	<button onclick="location.href='{{ url_for('compare')}}';">Compare Two Clients</button>
+	<button onclick="location.href='{{ url_for('predict_top')}}';">Top Clients</button>
 	<hr>
 	<div class="input">
 		<p>Please enter the details below :</p>
@@ -21,6 +43,12 @@
 			<label>From : </label>
 			<input type="date" name="from">
 			<br> <br>
+			<select  name="attribute_value">
+				  {% for elem in listofatt%}
+				   <option value= "{{elem}}" SELECTED>{{elem}}</option>"
+				  {% endfor %}
+			</select>
+			<br><br>
 			<input class="button" type="submit" name="submit" value="Predict future">
 		</form>
 		<br><br>
@@ -28,10 +56,13 @@
 
 	<div class="predict">
 		<br><br>
-		<iframe name="predict_frame" src="predict.html" height=400px width=700px>
-			{{prediction_text}}
+		<iframe id="site" name="predict_frame"   src="" height=400px width=700px>
 		</iframe>
 	</div>
+    
+    <br>
+    
+
 </body>
 </html>
 

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Predict Top Clients</title>
+	<style type="text/css">
+		body{
+			background-color: whitesmoke;
+			text-align: center;
+			font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;
+		}
+		.button{
+			background-color: black;
+			color: white;
+		}
+		table{
+			text-align: : center;
+			border: 1px solid black;
+			margin-left:auto;
+			margin-right:auto;
+			background-color: white;
+		}
+	</style>
+</head>
+<body>
+	<h1>Predict Top Clients</h1>
+	<hr><br>
+	<form class="pred_top" action="{{ url_for('predict_top')}}" method="POST" target="">
+		<label>Select no. of clients : </label>
+			<select name="number">
+				<option value=1>1</option>
+				<option value=2>2</option>
+				<option value=3>3</option>
+				<option value=4>4</option>
+				<option value=5>5</option>
+				<option value=6>6</option>
+			</select>
+			<br><br>
+		<input class="button" type="submit" name="submit" value="Submit">
+	</form>
+	<br>
+	<table>
+         <thead>
+            <tr>
+               <th>Client Name</th>
+               <th>Mean Predicted Amount</th>
+            </tr>
+         </thead>
+
+         <tbody>
+            {% for client,amount in result.items() %}
+               <tr>
+                  <td>{{ client }}</td>
+                  <td>{{ amount }}</td>
+               </tr>
+            {% endfor %}
+         </tbody>
+      </table>
+</body>
+</html>
