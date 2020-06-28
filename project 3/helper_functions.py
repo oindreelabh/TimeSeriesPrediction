@@ -5,6 +5,7 @@ import datetime
 from dateutil.relativedelta import relativedelta
 import calendar
 
+
 def give_dates(lastdate_) :
 	lastdate_=datetime.datetime.strptime(str(lastdate_),'%Y%m%d').date()
 	start_date=lastdate_
@@ -38,3 +39,4 @@ def take_fields():
 	for x in f:
 		listofatt.append(re.sub('\n', '', x))
 	return listofatt
+

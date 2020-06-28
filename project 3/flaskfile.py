@@ -6,7 +6,7 @@ import plotly.io as pio
 from datetime import date
 import datetime
 from dateutil.relativedelta import relativedelta
-from model import model_call
+from model import model_call , predict_top_clients
 import pandas as pd
 from plotly.subplots import make_subplots
 import plotly.graph_objects as go
@@ -18,6 +18,7 @@ from helper_functions import give_last_date, take_fields, give_dates
 
 app = Flask(__name__)
 
+print(',..............................................start......................................................')
 
 @app.route('/')
 @app.route('/home')
@@ -101,6 +102,23 @@ def script():
 
 	pio.write_html(fig, file='F:/project3_frontend/templates/output.html', auto_open=False)
 	return render_template('output.html')
+
+
+@app.route("/topNClients.html",  methods = ["POST", "GET"])
+def topNClients() :
+	result = {}
+	if request.method == 'POST' :
+		lename = request.form['lename']
+		number = request.form['number']
+		result=predict_top_clients(int(number))
+		print(result)
+		print('....................post result..............................')
+		return render_template('topNClients.html', result=result)
+    
+	print(result)
+	print('....................result....................')
+
+	return render_template('topNClients.html', result=result)
 
 @app.route("/alter.html")
 def alter() :
