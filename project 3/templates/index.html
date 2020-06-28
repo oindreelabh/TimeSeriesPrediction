@@ -24,11 +24,13 @@
 	    }
 	    reader.send(null);
 	</script>
+
 </head>
 <body>
 	<h1>Future Prediction</h1>
 	<hr>
 	<button onclick="location.href='{{ url_for('compare')}}';">Compare Two Clients</button>
+	<button onclick="location.href='{{ url_for('topNClients')}}';">Top Clients</button>
 	<hr>
 	<div class="input">
 		<p>Please enter the details below :</p>
