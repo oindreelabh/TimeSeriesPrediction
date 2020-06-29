@@ -5,7 +5,7 @@ import pandas as pd
 
 
 class OutputForm(FlaskForm):
-    df = pd.read_csv(r'F:/try/processed_data.csv')
+    df = pd.read_csv(r'processed_data.csv')
     cl = df['Client Name'].unique()
     clientName = SelectField('clientName' , choices = cl)
     Legal = SelectField('Le')
