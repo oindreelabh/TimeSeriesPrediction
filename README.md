@@ -5,7 +5,7 @@ Technology Used :
 
 Model - Python 3 - pandas, plotly, numpy, statsmodels, datetime
 
-UI - Python Flask, HTML CSS, JavaScript
+UI - Python Flask, HTML CSS, JavaScript, flask_wtf
 
 DATASET GENERATION
 
@@ -28,3 +28,4 @@ CREATING MODEL
 MODEL INTEGRATION TO UI
 
 "project 3" folder contains the flask app files to run this application.
+All the modules present in technology used section should be pre-installed in order to run the app.
