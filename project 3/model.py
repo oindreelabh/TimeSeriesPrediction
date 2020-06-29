@@ -6,7 +6,7 @@ import pandas as pd
 
 def model_call(client_name, le_name):
     df = pd.read_csv(r'processed_data.csv').set_index('Payment Date')
-    df = df[df['Client Name']==client_name]
+    df = df[(df['Client Name']==client_name)&(df['Legal Entity']==le_name)]
     train = df.iloc[:-10, :]
     test = df.iloc[-10:, :]
     pred = test.copy()
