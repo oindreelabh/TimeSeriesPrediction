@@ -40,7 +40,7 @@
 			
             {{ form.hidden_tag() }}
 		    <p>
-		        CLient Name: {{ form.clientName() }}
+		        Client Name: {{ form.clientName() }}
 	        </p>
 			<p>
 		        Legal Entity: {{form.Legal() }}
@@ -54,7 +54,6 @@
 				   <option value= "{{elem}}" SELECTED>{{elem}}</option>"
 				  {% endfor %}
 			</select>-->
-			<br><br>
 			<input class="button" type="submit" name="submit" value="Predict future">
 		</form>
 		<br><br>

@@ -24,16 +24,16 @@
 	    reader.send(null);
 	</script>
 </head>
-<body style="background-color: whitesmoke;">
+<body style="background-color: whitesmoke;font-family: 'Palatino Linotype', 'Book Antiqua', Palatino, serif;">
     <div>
     	<h2 style="text-align: center; margin-top: 0%">Compare Two Clients</h2>
-    	<button onclick="location.href='{{ url_for('home')}}';">Back</button>
+    	<button onclick="location.href='{{ url_for('home')}}';" style="background-color: black; color: white;">Back</button>
     	<hr>
     </div>
     <div style="width:50%;  margin-left: 25%" >	
 
 	<form id = "myForm" name = "Details" action = "{{url_for('script')}}" method="POST" target="output_frame">
-		<div  style='float:left'>
+		<div  style='float:left; width:50%; text-align:center;'>
 		    <label>Client Name 1 : </label>
 		    <select name = "client1" >
 		    	{% for allnames in allClients %}
@@ -52,7 +52,7 @@
 
 		</div>
 
-		<div  style='float:right'>
+		<div  style='float:right; width:50%; text-align: center;'>
 			<label>Client Name 2 : </label>
 			<select name = "client2" >
 				{% for allnames in allClients %}
@@ -66,25 +66,25 @@
 			<select name = "legal2" >
 				{% for allnames in allLegalEntities %}
 				   <option value= "{{allnames}}" selected>{{allnames}}</option>"
-				  {% endfor %}
+				{% endfor %}
 			</select>
 
 
 		</div>
+        <br>
 
-
-		<div style=" margin-left : 25% ;" >
-			<br><br><br><br>
+		<div style=" margin-left : 30% ;" >
+			<br><br><br><br><br>
 			<label>From : </label>
 			<input type="date" name="from" required>
-			<br>
+			<br><br>
 			<!---<label>Select attribute to compare : </label>
 			<select  name="attribute_value">
 				  {% for elem in listofatt%}
 				   <option value= "{{elem}}" SELECTED>{{elem}}</option>"
 				  {% endfor %}
 			</select>-->
-			<input type="submit" value="Submit" style=" margin-left : 20% ;" required>
+			<input type="submit" value="Submit" style=" margin-left : 20%; background-color: black; color: white;" required>
 		</div>
 	</form>
 
@@ -102,7 +102,6 @@
     	<iframe name="output_frame" src="output.html" height=0px width=0px>
     		
 		</iframe>
-    </div>
-    --->
+    </div>--->
 </body>
 </html>
