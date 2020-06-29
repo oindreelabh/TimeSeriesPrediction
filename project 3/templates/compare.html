@@ -34,7 +34,7 @@
 
 	<form id = "myForm" name = "Details" action = "{{url_for('script')}}" method="POST" target="output_frame">
 		<div  style='float:left'>
-		    <label>Client Name : </label>
+		    <label>Client Name 1 : </label>
 		    <select name = "client1" >
 		    	{% for allnames in allClients %}
 				   <option value= "{{allnames}}" selected>{{allnames}}</option>"
@@ -42,7 +42,7 @@
 			</select>
 
 		    <br><br>
-		    <label>Legal Entity Name : </label> 
+		    <label>Legal Entity Name 1 : </label> 
 		    <select name = "legal1" >
 		    	{% for allnames in allLegalEntities %}
 				   <option value= "{{allnames}}" selected>{{allnames}}</option>"
@@ -53,7 +53,7 @@
 		</div>
 
 		<div  style='float:right'>
-			<label>Client Name : </label>
+			<label>Client Name 2 : </label>
 			<select name = "client2" >
 				{% for allnames in allClients %}
 				   <option value= "{{allnames}}" selected>{{allnames}}</option>"
@@ -62,7 +62,7 @@
 
 
 			<br><br>
-			<label>Legal Entity Name : </label> 
+			<label>Legal Entity Name 2 : </label> 
 			<select name = "legal2" >
 				{% for allnames in allLegalEntities %}
 				   <option value= "{{allnames}}" selected>{{allnames}}</option>"
@@ -78,12 +78,12 @@
 			<label>From : </label>
 			<input type="date" name="from" required>
 			<br>
-			<label>Select attribute to compare : </label>
+			<!---<label>Select attribute to compare : </label>
 			<select  name="attribute_value">
 				  {% for elem in listofatt%}
 				   <option value= "{{elem}}" SELECTED>{{elem}}</option>"
 				  {% endfor %}
-			</select>
+			</select>-->
 			<input type="submit" value="Submit" style=" margin-left : 20% ;" required>
 		</div>
 	</form>
@@ -91,8 +91,8 @@
     </div>
     <hr> 
     
-    <div style=" margin-left : 25% ;">
-    	<iframe id='site' name="output_frame" src="output.html" height=390px width=900px>
+    <div style="margin-left: 10%">
+    	<iframe id='site' name="output_frame" src="output.html" height=650px width=1000px>
 		</iframe>
     </div>
 

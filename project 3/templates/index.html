@@ -25,6 +25,8 @@
 	    reader.send(null);
 	</script>
 
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+
 </head>
 <body>
 	<h1>Future Prediction</h1>
@@ -35,28 +37,23 @@
 	<div class="input">
 		<p>Please enter the details below :</p>
 		<form class="my-form" action="{{ url_for('predict')}}" method="POST" target="predict_frame">
-			<label>Client Name : </label>
-			<select  name="cname">
-				  {% for allnames in allClients %}
-				   <option value= "{{allnames}}" selected>{{allnames}}</option>"
-				  {% endfor %}
-			</select>
-			<br> <br>
-			<label>Legal Entity Name : </label>
-			<select name="lename">
-				 {% for allnames in allLegalEntities %}
-				   <option value= "{{allnames}}" selected>{{allnames}}</option>"
-				  {% endfor %}
-			</select>
-			<br> <br>
+			
+            {{ form.hidden_tag() }}
+		    <p>
+		        CLient Name: {{ form.clientName() }}
+	        </p>
+			<p>
+		        Legal Entity: {{form.Legal() }}
+		    </p>
+
 			<label>From : </label>
 			<input type="date" name="from">
 			<br> <br>
-			<select  name="attribute_value">
+			<!--<select  name="attribute_value">
 				  {% for elem in listofatt%}
 				   <option value= "{{elem}}" SELECTED>{{elem}}</option>"
 				  {% endfor %}
-			</select>
+			</select>-->
 			<br><br>
 			<input class="button" type="submit" name="submit" value="Predict future">
 		</form>
@@ -71,6 +68,30 @@
     
     <br>
     
+    <script>
+      $(document).ready(function() {
+        $('#clientName').change(function() {
+
+          var cl = $('#clientName').val();
+
+          // Make Ajax Request and expect JSON-encoded data
+          $.getJSON(
+            '/get_food' + '/' + cl,
+            function(data) {
+
+              // Remove old options
+              $('#Legal').find('option').remove();                                
+
+              // Add new items
+              $.each(data, function(key, val) {
+                var option_item = '<option value="' + val + '">' + val + '</option>'
+                $('#Legal').append(option_item);
+              });
+            }
+          );
+        });
+      });
+    </script>
 
 </body>
 </html>
