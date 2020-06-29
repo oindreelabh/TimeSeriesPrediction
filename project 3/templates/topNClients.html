@@ -22,18 +22,22 @@
 	</style>
 </head>
 <body>
-	
-	
+
     	<h2 style="text-align: center; margin-top: 0%">Predict Top Clients</h2>
     	<hr>
-    	<button onclick="location.href='{{ url_for('home')}}';">Back</button>
+    	<button style='float:left'  onclick="location.href='{{ url_for('home')}}';">Back</button>
+    	<br>
     	<hr>
-    
-
 
 	<form class="pred_top" action="{{ url_for('topNClients')}}" method="POST" target="">
 		<label>Legal Entity Name : </label>
-		<input type="text" name="lename">
+		<select name="lename">
+			{% for allnames in allLegalEntities %}
+				   <option value= "{{allnames}}" selected>{{allnames}}</option>"
+				  {% endfor %}
+			</select>
+
+
 		<label>Select no. of clients : </label>
 			<select name="number">
 				<option value=1>1</option>
