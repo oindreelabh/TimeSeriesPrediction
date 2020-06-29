@@ -19,7 +19,7 @@ def give_dates(lastdate_ , num=7) :
 	return data
 
 def give_last_date(cname, lename):
-	with open("F:/project3_frontend/processed_data.csv", 'r') as csvfile:
+	with open("F:/try/processed_data.csv", 'r') as csvfile:
 		csvreader = csv.reader(csvfile)
 		fields=next(csvreader)
 		last_date =""
@@ -37,7 +37,7 @@ def give_clients_and_entities():
 	allData=[]
 	allClients=set()
 	allLegalEntities=set()
-	with open("F:/project3_frontend/processed_data.csv", 'r') as csvfile :
+	with open("F:/try/processed_data.csv", 'r') as csvfile :
 		csvreader = csv.reader(csvfile)
 		fields=next(csvreader)
 		for row in csvreader:
@@ -50,7 +50,7 @@ def give_clients_and_entities():
 
 
 def take_fields():
-	f = open("F:/project3_frontend/fields_to_take.txt", "r")
+	f = open("F:/try/fields_to_take.txt", "r")
 	listofatt=[]
 	for x in f:
 		listofatt.append(re.sub('\n', '', x))

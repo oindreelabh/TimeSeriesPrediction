@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd 
 
 def model_call(client_name, le_name):
-    df = pd.read_csv(r'F:/Project3_frontend/processed_data.csv').set_index('Payment Date')
+    df = pd.read_csv(r'F:/try/processed_data.csv').set_index('Payment Date')
     df = df[df['Client Name']==client_name]
     train = df.iloc[:-10, :]
     test = df.iloc[-10:, :]
@@ -31,9 +31,9 @@ def get_key(val, my_dict):
 
     return "key doesn't exist"
 
-def predict_top_clients(num):
+def predict_top_clients(num, forecast_num=6):
     
-    df = pd.read_csv(r'F:/project3_frontend/processed_data.csv', parse_dates=['Payment Date'], index_col='Payment Date')
+    df = pd.read_csv(r'F:/try/processed_data.csv', parse_dates=['Payment Date'], index_col='Payment Date')
 
     model_dict = {}
 
@@ -48,7 +48,7 @@ def predict_top_clients(num):
     predicted_range = {}
 
     for client, model in model_dict.items():
-        pred = model.forecast(12)
+        pred = model.forecast(forecast_num)
         predicted_range[client] = pred
         predicted_amounts[client] = pred.mean()
 
@@ -63,9 +63,9 @@ def predict_top_clients(num):
     final_result = {}
     for client in result :
         temp_result = list()
-        temp_result.append(result[client])
+        temp_result.append(round(result[client], 3))
         for x in predicted_range[client]:
-            temp_result.append(x)
+            temp_result.append(round(x, 3))
         final_result[client] = temp_result
 
     print(result)

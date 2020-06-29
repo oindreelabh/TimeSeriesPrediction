@@ -1,5 +1,5 @@
 
-from flask import Flask, render_template, url_for, request
+from flask import Flask, render_template, url_for, request, jsonify
 import pickle
 import plotly.express as px
 import plotly.io as pio
@@ -13,10 +13,12 @@ import plotly.graph_objects as go
 import datetime
 import numpy as np
 from helper_functions import give_last_date, take_fields, give_dates, give_clients_and_entities
+from forms import OutputForm
 
 
 
 app = Flask(__name__)
+app.config['SECRET_KEY'] = '5791628bb0b13ce0c676dfde280ba245'
 
 allClients=[]
 allLegalEntities=[]
@@ -26,15 +28,35 @@ allLegalEntities=allData[1]
 listofatt=take_fields()
 final_result = predict_top_clients(len(allClients))
 
+df = pd.read_csv(r'F:/try/processed_data.csv')
+d = {}
+for i in range(len(df)):
+	key = df.iloc[i,1]
+	val = df.iloc[i,2]
+	if key in d.keys():
+		if val not in d[key]:
+			d[key].append(val)
+	else:	
+	    d[key] = []
+	    d[key].append(df.iloc[i,2])
+
+
 print(final_result)
 print('..................')
 print(allLegalEntities)
 print(',..............................................start......................................................')
 
+
+@app.route('/get_food/<cl>')
+def get_food(cl):                                                                                    
+    return jsonify(d[cl])
+
+
 @app.route('/')
 @app.route('/home')
 def home():
-	return render_template('index.html', listofatt=listofatt, allClients=allClients, allLegalEntities=allLegalEntities)
+	form = OutputForm()
+	return render_template('index.html', listofatt=listofatt, allClients=allClients, allLegalEntities=allLegalEntities, form = form)
 
 
 @app.route("/compare")
@@ -44,10 +66,11 @@ def compare():
 
 @app.route('/predict',methods=['POST'])
 def predict():
-	cname = request.form['cname'];
-	lename = request.form['lename'];
+	form = OutputForm()
 	from_d = request.form['from'];
-	attribute_value = request.form['attribute_value'];
+	cname = form.clientName.data
+	lename = form.Legal.data;
+	#attribute_value = request.form['attribute_value'];
 	
 	df = model_call(str(cname),str(lename))
 	model = pickle.load(open('model.pkl', 'rb'))
@@ -61,9 +84,7 @@ def predict():
 
 	fig = go.Figure()
 	fig.add_trace(go.Scatter(x = df[start:].index, y=df[start:], mode='lines', name='Recorded'))
-	fig.add_trace(go.Scatter(x=give_dates(lastdate_), y=show_predict, mode='lines', name='Predicted'))
-	positive_verdict='This is the graph for predicted values of 6 months from now. It is beneficial to work with this client'
-	negative_verdict='This is the graph for predicted values of 6 months from now. It is not beneficial to work with this client'
+	fig.add_trace(go.Scatter(x=give_dates(lastdate_), y=show_predict, mode='lines', name='Predicted',line=dict(width=4, dash='dot')))
 	slope = pred[-1] - df[-1]
 	final_verdict=''
 	if slope>0:
@@ -73,7 +94,7 @@ def predict():
 	fig.update_layout(title_text=final_verdict)
 	fig.update_yaxes(title_text="Paid Amount")
 	fig.update_xaxes(title_text='Dates')
-	pio.write_html(fig, file='F:/project3_frontend/templates/predict.html', auto_open=False)
+	pio.write_html(fig, file='F:/try/templates/predict.html', auto_open=False)
 	return render_template('predict.html')
 	   
 
@@ -86,7 +107,7 @@ def script():
 	legal1 = request.form['legal1'];
 	legal2 = request.form['legal2'];
 	from_d = request.form['from'];
-	attribute_value = request.form['attribute_value'];
+	#attribute_value = request.form['attribute_value'];
 	start = from_d
 
 	df1 = model_call(str(client1),str(legal1))
@@ -107,25 +128,34 @@ def script():
 	show_predict2=np.append(show_predict2, pred2)
 	
 	print(type(show_predict2))
-	fig = make_subplots(rows=1, cols=2)
-	fig.add_trace(go.Scatter(x =df1[start:].index,y=df1[start:],mode='lines',name='Recorded trend 1'),row=1,col=1)
-	fig.add_trace(go.Scatter(x=give_dates(lastdate_1),y=show_predict1,mode='lines',name='Predicted trend 1'),row=1,col=1)
-	fig.add_trace(go.Scatter(x = df2[start:].index, y=df2[start:], mode='lines', name='Recorded Trend 2'),row=1,col=2)
-	fig.add_trace(go.Scatter(x=give_dates(lastdate_2), y=show_predict2, mode='lines', name='Predicted trend 2'),row=1,col=2)
+	#fig = make_subplots(rows=1, cols=2)
+	fig = go.Figure()
+	fig.add_trace(go.Scatter(x =df1[start:].index,y=df1[start:],mode='lines',name='Recorded trend 1'))
+	fig.add_trace(go.Scatter(x=give_dates(lastdate_1),y=show_predict1,mode='lines',name='Predicted trend 1',line=dict(width=4, dash='dot')))
+	fig.add_trace(go.Scatter(x = df2[start:].index, y=df2[start:], mode='lines', name='Recorded Trend 2'))
+	fig.add_trace(go.Scatter(x=give_dates(lastdate_2), y=show_predict2, mode='lines', name='Predicted trend 2', line=dict(width=4, dash='dot')))
+	fig.update_yaxes(title_text="Paid Amount")
+	fig.update_xaxes(title_text='Dates')
 
-
-	pio.write_html(fig, file='F:/project3_frontend/templates/output.html', auto_open=False)
+	pio.write_html(fig, file='F:/try/templates/output.html', auto_open=False)
 	return render_template('output.html')
 
 
 @app.route("/topNClients.html",  methods = ["POST", "GET"])
 def topNClients() :
 	result = {}
-	dummy = {}
+	
 	
 	if request.method == 'POST' :
 		x_bar = list()
-		x_scatter = give_dates("20201212", 12)
+		name_scatter =[]
+		now_date=str(date.today())
+		new_now_date=""
+		for w in now_date :
+			if(w!='-') :
+				new_now_date+=w
+		x_scatter_temp = give_dates(new_now_date, 6)
+		x_scatter=x_scatter_temp[1:]
 		print(x_scatter)
 		print('<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
 		y_bar = list()
@@ -137,65 +167,77 @@ def topNClients() :
 		print(table_col)
 		print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
 		table_col.append('Predicted Paid Amt Mean(USD)')
-		tabel_row = list()
-		table_row_temp1 = list()
+		table_row = list()
+		'''table_row_temp1 = list()
 		for key in final_result.keys() :
 			tabel_row_temp1.append(key)
-		tabel_row.append(tabel_row_temp1)
+		tabel_row.append(tabel_row_temp1)'''
 		
-		lename = request.form['lename']
+		#lename = request.form['lename']
 		number = request.form['number']
-
-        for i in range(1 to 12) :
-        	tabel_row_temp=list()
-        	for key in final_result.keys():
-        		tabel_row_temp.append(final_result[key][i])
-        	tabel_row.append(tabel_row_temp)
-        tabel_row_temp=list()
-        for key in final_result.keys():
-        		tabel_row_temp.append(final_result[key][i])
-        	tabel_row.append(tabel_row_temp)
-
-
+		result['number']='number'
 		i=0
 		for key in final_result.keys():
 			#result[key]=final_result[key]
 			x_bar.append(key)
 			y_bar.append(int(final_result[key][0]))
-			tabel_row_temp=list()
-			tabel_row_temp.append(key)
+			table_row_temp=list()
+			table_row_temp.append(key)
 			y_scatter_temp = list()
 			j=1
 			while j < len(final_result[key]):
 				y_scatter_temp.append(final_result[key][j])
-				tabel_row_temp.append(final_result[key][j])
+				table_row_temp.append(final_result[key][j])
 				j=j+1
-			tabel_row_temp.append(final_result[key][0])
+			table_row_temp.append(final_result[key][0])
 			y_scatter.append(y_scatter_temp)
-			tabel_row.append(tabel_row_temp)
+			table_row.append(table_row_temp)
 			i=i+1
 			if i ==int(number) :
 				break
 
-		print(tabel_row)
+		print(table_row)
 		print('????????????????????????????????????????????????????????????????????????')
-		fig = make_subplots(rows=3, cols=1,  vertical_spacing=0.06,specs=[ [{"type": "table"}],[{"type": "bar"}],[{"type": "scatter"}] ] )
-		fig.add_trace(go.Table(header=dict(values=table_col,font=dict(size=10),align="left"), cells=dict(values=tabel_row),align="left"), row=1, col=1)
-		fig.add_trace(go.Bar(x=x_bar, y=y_bar), row=2, col=1)
+		new_table_row = []
+		for i in range(len(table_row[0])):
+			table_row_temp_new = []
+			for elem in table_row :
+				table_row_temp_new.append(elem[i])
+			new_table_row.append(table_row_temp_new)
+
+		for word in x_bar:
+			if len(word) < 12:
+				name_scatter.append(word)
+			else :
+				small_word=""
+				for i in range(12) :
+					small_word+=word[i]
+				name_scatter.append(small_word+"...")
+		
+		fig = make_subplots(rows=3, cols=1,  vertical_spacing=0.09,specs=[ [{"type": "table"}],[{"type": "bar"}],[{"type": "scatter"}] ] )
+		fig.add_trace(go.Table(header=dict(values=table_col,font=dict(size=10),align="left"), cells=dict(values=new_table_row,  height=40,align="left")), row=1, col=1)
+		fig.add_trace(go.Bar(x=name_scatter, y=y_bar, text=x_bar,textposition='outside'), row=2, col=1)
+		fig.update_yaxes(title_text="Mean Prdicted Amt(USD)", row=2, col=1)
+		#fig.update_xaxes(title_text="Clients", row=2, col=1)
+		fig.update_yaxes(title_text="Predicted Paid Amt ", row=3, col=1)
+		fig.update_xaxes(title_text="Dates", row=3, col=1)
+		#fig.update_layout(uniformtext_minsize=8, uniformtext_mode='hide')
 		print(y_scatter)
 		print('LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL')
+		i=0
 		for element_y in y_scatter:
-			fig.add_trace(go.Scatter(x=x_scatter, y=element_y), row=3, col=1)	
-		pio.write_html(fig, file='F:/project3_frontend/templates/topNClientsGraph.html')
+			fig.add_trace(go.Scatter(x=x_scatter, y=element_y, name=name_scatter[i]), row=3, col=1)
+			i=i+1	
+		pio.write_html(fig, file='F:/try/templates/topNClientsGraph.html')
 	
 		print(result)
 		print('....................post result..............................')
-		return render_template('topNClients.html', result=dummy, allLegalEntities=allLegalEntities)
+		return render_template('topNClientsGraph.html')
     
 	print(result)
 	print('....................result....................')
 
-	return render_template('topNClients.html', result=result, allLegalEntities=allLegalEntities)
+	return render_template('topNClients.html', allClientsNumber=len(allClients))
 
 
 @app.route("/alter.html")
