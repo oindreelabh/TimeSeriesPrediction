@@ -27,5 +27,5 @@ CREATING MODEL
 
 MODEL INTEGRATION TO UI
 
-"project 3" folder contains the flask app files to run this application.
-All the modules present in TECHNOLOGY USED section should be pre-installed in order to run the app.
+"project 3" folder contains the flaskfile.py file which is needed to run this application.
+All the modules present in TECHNOLOGY USED section should be pre-installed.
