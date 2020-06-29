@@ -45,9 +45,11 @@ def predict_top_clients(num):
         model_dict[client] = hw_model1 if hw_model1.aic < hw_model2.aic else hw_model2
 
     predicted_amounts = {}
+    predicted_range = {}
 
     for client, model in model_dict.items():
         pred = model.forecast(12)
+        predicted_range[client] = pred
         predicted_amounts[client] = pred.mean()
 
     values = list(predicted_amounts.values())
@@ -58,7 +60,16 @@ def predict_top_clients(num):
     for i in range(1,num + 1):
         result[get_key(values[-1*i],predicted_amounts)] = values[-1*i]
 
+    final_result = {}
+    for client in result :
+        temp_result = list()
+        temp_result.append(result[client])
+        for x in predicted_range[client]:
+            temp_result.append(x)
+        final_result[client] = temp_result
+
     print(result)
+    print(final_result)
     print(',,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,')
 
-    return result
+    return final_result
