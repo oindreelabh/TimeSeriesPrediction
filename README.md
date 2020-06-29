@@ -1,7 +1,7 @@
 # Forecasting of Time Series
 Our current project is based on margin calls, trades, disputes etc. Future prediction using artificial intelligence to analyze past 1-2 years of data and predict the future like whether the exposure amount is going to increase or decrease in future etc.
 
-Technology Used :
+TECHNOLOGY USED :
 
 Model - Python 3 - pandas, matplotlib, numpy, statsmodels, datetime
 
@@ -28,4 +28,4 @@ CREATING MODEL
 MODEL INTEGRATION TO UI
 
 "project 3" folder contains the flask app files to run this application.
-All the modules present in technology used section should be pre-installed in order to run the app.
+All the modules present in TECHNOLOGY USED section should be pre-installed in order to run the app.
