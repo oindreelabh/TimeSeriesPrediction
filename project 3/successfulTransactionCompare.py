@@ -16,7 +16,7 @@ def comparareClientsTransaction(number, allClients):
         temp['PENDING_COLLATERAL']=0.0
         readed_data[cli]=temp
 
-    with open("F:/try/processed_data.csv", 'r') as csvfile:
+    with open("/processed_data.csv", 'r') as csvfile:
         csvreader = csv.reader(csvfile)
         fields=next(csvreader)
         #test=0
