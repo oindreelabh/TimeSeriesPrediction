@@ -1,11 +1,11 @@
 import pandas as pd
 from statsmodels.tsa.holtwinters import ExponentialSmoothing
 import pickle
-import numpy as np 
-import pandas as pd 
+import numpy as np
+import pandas as pd
 
 def model_call(client_name, le_name):
-    df = pd.read_csv(r'processed_data.csv').set_index('Payment Date')
+    df = pd.read_csv(r'../processed_data.csv').set_index('Payment Date')
     df = df[(df['Client Name']==client_name)&(df['Legal Entity']==le_name)]
     train = df.iloc[:-10, :]
     test = df.iloc[-10:, :]
@@ -27,13 +27,13 @@ def get_key(val, my_dict):
 
     for key, value in my_dict.items():
         if val == value:
-            return key 
+            return key
 
     return "key doesn't exist"
 
 def predict_top_clients(num, forecast_num=6):
-    
-    df = pd.read_csv(r'processed_data.csv', parse_dates=['Payment Date'], index_col='Payment Date')
+
+    df = pd.read_csv(r'../processed_data.csv', parse_dates=['Payment Date'], index_col='Payment Date')
 
     model_dict = {}
 
@@ -54,7 +54,7 @@ def predict_top_clients(num, forecast_num=6):
 
     values = list(predicted_amounts.values())
     values.sort()
-    
+
     result = {}
 
     for i in range(1,num + 1):

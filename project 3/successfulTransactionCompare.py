@@ -16,7 +16,7 @@ def comparareClientsTransaction(number, allClients):
         temp['PENDING_COLLATERAL']=0.0
         readed_data[cli]=temp
 
-    with open("/processed_data.csv", 'r') as csvfile:
+    with open("../processed_data.csv", 'r') as csvfile:
         csvreader = csv.reader(csvfile)
         fields=next(csvreader)
         #test=0
@@ -69,5 +69,4 @@ def comparareClientsTransaction(number, allClients):
     fig1.add_trace(go.Bar(x=x_bar, y=y_bar_resolved, name='Resolved', hovertext='Resolved Payments %',text=y_bar_resolved, textposition='auto'), row=2, col=1)
     fig1.add_trace(go.Bar(x=x_bar, y=y_bar_pendingcollateral, name='Pending Col..',hovertext='Pending Collateral %',text=y_bar_pendingcollateral, textposition='auto'), row=2, col=1)
     fig1.add_trace(go.Bar(x=x_bar, y=y_bar_discarded, name='Discarded',hovertext='Discarded %',text=y_bar_discarded, textposition='auto'), row=2, col=1)
-    pio.write_html(fig1, file='F:/try/templates/topNClientsGraph.html')
-              
+    pio.write_html(fig1, file='templates/topNClientsGraph.html')

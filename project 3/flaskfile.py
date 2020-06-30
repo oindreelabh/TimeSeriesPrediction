@@ -30,7 +30,7 @@ allLegalEntities=allData[1]
 listofatt=take_fields()
 final_result = predict_top_clients(len(allClients))
 
-df = pd.read_csv(r'/processed_data.csv')
+df = pd.read_csv(r'../processed_data.csv')
 d = {}
 for i in range(len(df)):
 	key = df.iloc[i,1]
@@ -38,7 +38,7 @@ for i in range(len(df)):
 	if key in d.keys():
 		if val not in d[key]:
 			d[key].append(val)
-	else:	
+	else:
 	    d[key] = []
 	    d[key].append(df.iloc[i,2])
 
@@ -50,7 +50,7 @@ print(',..............................................start.....................
 
 
 @app.route('/get_food/<cl>')
-def get_food(cl):                                                                                    
+def get_food(cl):
     return jsonify(d[cl])
 
 
@@ -73,7 +73,7 @@ def predict():
 	cname = form.clientName.data
 	lename = form.Legal.data;
 	#attribute_value = request.form['attribute_value'];
-	
+
 	df = model_call(str(cname),str(lename))
 	model = pickle.load(open('model.pkl', 'rb'))
 	lastdate_=give_last_date(cname, lename)
@@ -81,7 +81,7 @@ def predict():
 	start = from_d
 	show_predict=np.array(df[str(datetime.datetime.strptime(str(lastdate_),'%Y%m%d').date())])
 	show_predict=np.append(show_predict, pred)
-	
+
 
 
 	fig = go.Figure()
@@ -96,12 +96,12 @@ def predict():
 	fig.update_layout(title_text=final_verdict)
 	fig.update_yaxes(title_text="Paid Amount")
 	fig.update_xaxes(title_text='Dates')
-	pio.write_html(fig, file='/templates/predict.html', auto_open=False)
+	pio.write_html(fig, file='templates/predict.html', auto_open=False)
 	return render_template('predict.html')
-	   
 
 
-      
+
+
 @app.route("/script", methods = ["POST"])
 def script():
 	client1 = request.form['client1'];
@@ -128,7 +128,7 @@ def script():
 	print('.............................................................')
 	show_predict2=np.array(df2[str(datetime.datetime.strptime(str(lastdate_2),'%Y%m%d').date())])
 	show_predict2=np.append(show_predict2, pred2)
-	
+
 	print(type(show_predict2))
 	#fig = make_subplots(rows=1, cols=2)
 	fig = go.Figure()
@@ -139,13 +139,13 @@ def script():
 	fig.update_yaxes(title_text="Paid Amount")
 	fig.update_xaxes(title_text='Dates')
 
-	pio.write_html(fig, file='/templates/output.html', auto_open=False)
+	pio.write_html(fig, file='templates/output.html', auto_open=False)
 	return render_template('output.html')
 
 
 @app.route("/topNClients.html",  methods = ["POST", "GET"])
 def topNClients() :
-	
+
 	if request.method == 'POST' :
 		number = request.form['number']
 		criteria= request.form['criteria']
@@ -168,7 +168,7 @@ def topNClients() :
 				table_col.append(str(var))
 			table_col.append('Predicted Paid Amt Mean(USD)')
 			table_row = list()
-			
+
 			i=0
 			for key in final_result.keys():
 				x_bar.append(key)
@@ -203,26 +203,26 @@ def topNClients() :
 					for i in range(12) :
 						small_word+=word[i]
 					name_scatter.append(small_word+"...")
-			
+
 			fig = make_subplots(rows=3, cols=1,  vertical_spacing=0.09,specs=[ [{"type": "table"}],[{"type": "bar"}],[{"type": "scatter"}] ] )
 			fig.add_trace(go.Table(header=dict(values=table_col,font=dict(size=10),align="left"), cells=dict(values=new_table_row,  height=40,align="left")), row=1, col=1)
 			fig.add_trace(go.Bar(x=name_scatter, y=y_bar, text=x_bar,textposition='outside'), row=2, col=1)
 			fig.update_yaxes(title_text="Mean Prdicted Amt(USD)", row=2, col=1)
 			fig.update_yaxes(title_text="Predicted Paid Amt ", row=3, col=1)
 			fig.update_xaxes(title_text="Dates", row=3, col=1)
-			
+
 			i=0
 			for element_y in y_scatter:
 				fig.add_trace(go.Scatter(x=x_scatter, y=element_y, name=name_scatter[i]), row=3, col=1)
 				i=i+1
-			pio.write_html(fig, file='/templates/topNClientsGraph.html')
+			pio.write_html(fig, file='templates/topNClientsGraph.html')
 
 		else :
 			comparareClientsTransaction(number, allClients)
 
-	
+
 		return render_template('topNClientsGraph.html')
-    
+
 
 	return render_template('topNClients.html', allClientsNumber=len(allClients))
 
@@ -234,4 +234,4 @@ def alter() :
 
 
 if __name__ == '__main__':
-      app.run(debug=True)    
+      app.run(debug=True)
