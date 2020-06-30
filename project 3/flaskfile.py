@@ -30,7 +30,7 @@ allLegalEntities=allData[1]
 listofatt=take_fields()
 final_result = predict_top_clients(len(allClients))
 
-df = pd.read_csv(r'F:/try/processed_data.csv')
+df = pd.read_csv(r'/processed_data.csv')
 d = {}
 for i in range(len(df)):
 	key = df.iloc[i,1]
@@ -96,7 +96,7 @@ def predict():
 	fig.update_layout(title_text=final_verdict)
 	fig.update_yaxes(title_text="Paid Amount")
 	fig.update_xaxes(title_text='Dates')
-	pio.write_html(fig, file='F:/try/templates/predict.html', auto_open=False)
+	pio.write_html(fig, file='/templates/predict.html', auto_open=False)
 	return render_template('predict.html')
 	   
 
@@ -139,7 +139,7 @@ def script():
 	fig.update_yaxes(title_text="Paid Amount")
 	fig.update_xaxes(title_text='Dates')
 
-	pio.write_html(fig, file='F:/try/templates/output.html', auto_open=False)
+	pio.write_html(fig, file='/templates/output.html', auto_open=False)
 	return render_template('output.html')
 
 
@@ -215,7 +215,7 @@ def topNClients() :
 			for element_y in y_scatter:
 				fig.add_trace(go.Scatter(x=x_scatter, y=element_y, name=name_scatter[i]), row=3, col=1)
 				i=i+1
-			pio.write_html(fig, file='F:/try/templates/topNClientsGraph.html')
+			pio.write_html(fig, file='/templates/topNClientsGraph.html')
 
 		else :
 			comparareClientsTransaction(number, allClients)
