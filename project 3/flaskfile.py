@@ -30,7 +30,7 @@ allLegalEntities=allData[1]
 listofatt=take_fields()
 final_result = predict_top_clients(len(allClients))
 
-df = pd.read_csv(r'../processed_data.csv')
+df = pd.read_csv(r'processed_data.csv')
 d = {}
 for i in range(len(df)):
 	key = df.iloc[i,1]
@@ -38,7 +38,7 @@ for i in range(len(df)):
 	if key in d.keys():
 		if val not in d[key]:
 			d[key].append(val)
-	else:
+	else:	
 	    d[key] = []
 	    d[key].append(df.iloc[i,2])
 
@@ -50,7 +50,7 @@ print(',..............................................start.....................
 
 
 @app.route('/get_food/<cl>')
-def get_food(cl):
+def get_food(cl):                                                                                    
     return jsonify(d[cl])
 
 
@@ -73,7 +73,7 @@ def predict():
 	cname = form.clientName.data
 	lename = form.Legal.data;
 	#attribute_value = request.form['attribute_value'];
-
+	
 	df = model_call(str(cname),str(lename))
 	model = pickle.load(open('model.pkl', 'rb'))
 	lastdate_=give_last_date(cname, lename)
@@ -81,7 +81,7 @@ def predict():
 	start = from_d
 	show_predict=np.array(df[str(datetime.datetime.strptime(str(lastdate_),'%Y%m%d').date())])
 	show_predict=np.append(show_predict, pred)
-
+	
 
 
 	fig = go.Figure()
@@ -98,10 +98,10 @@ def predict():
 	fig.update_xaxes(title_text='Dates')
 	pio.write_html(fig, file='templates/predict.html', auto_open=False)
 	return render_template('predict.html')
+	   
 
 
-
-
+      
 @app.route("/script", methods = ["POST"])
 def script():
 	client1 = request.form['client1'];
@@ -109,13 +109,14 @@ def script():
 	legal1 = request.form['legal1'];
 	legal2 = request.form['legal2'];
 	from_d = request.form['from'];
-	#attribute_value = request.form['attribute_value'];
 	start = from_d
+
 
 	df1 = model_call(str(client1),str(legal1))
 	model = pickle.load(open('model.pkl', 'rb'))
 	lastdate_1=give_last_date(client1, legal1)
 	pred1=model.forecast(6)
+	pred1_mean=round(pred1.mean(), 3)
 	show_predict1=np.array(df1[str(datetime.datetime.strptime(str(lastdate_1),'%Y%m%d').date())])
 	show_predict1=np.append(show_predict1, pred1)
 
@@ -124,20 +125,32 @@ def script():
 	model = pickle.load(open('model.pkl', 'rb'))
 	lastdate_2=give_last_date(client2, legal2)
 	pred2=model.forecast(6)
+	pred2_mean=round(pred2.mean(), 3)
 	print(lastdate_2)
 	print('.............................................................')
 	show_predict2=np.array(df2[str(datetime.datetime.strptime(str(lastdate_2),'%Y%m%d').date())])
 	show_predict2=np.append(show_predict2, pred2)
-
+	
 	print(type(show_predict2))
 	#fig = make_subplots(rows=1, cols=2)
-	fig = go.Figure()
-	fig.add_trace(go.Scatter(x =df1[start:].index,y=df1[start:],mode='lines',name='Recorded trend 1'))
-	fig.add_trace(go.Scatter(x=give_dates(lastdate_1),y=show_predict1,mode='lines',name='Predicted trend 1',line=dict(width=4, dash='dot')))
-	fig.add_trace(go.Scatter(x = df2[start:].index, y=df2[start:], mode='lines', name='Recorded Trend 2'))
-	fig.add_trace(go.Scatter(x=give_dates(lastdate_2), y=show_predict2, mode='lines', name='Predicted trend 2', line=dict(width=4, dash='dot')))
-	fig.update_yaxes(title_text="Paid Amount")
-	fig.update_xaxes(title_text='Dates')
+	table_col=['Clients', 'Legal Entity', 'Mean of Predicted Paid Amount (USD)']
+	table_title=""
+	if pred1_mean > pred2_mean :
+		table_row=[[client1, client2], [legal1, legal2], [pred1_mean, pred2_mean]]
+		table_title="Client 1 and Legal Entity 1 are expected to do better business based on predicted mean amount"
+	else :
+		table_title="Client 2 and Legal Entity 2 are expected to do better business based on predicted mean amount "
+		table_row=[[client2, client1], [legal2, legal1], [pred2_mean, pred1_mean]]
+
+	fig = make_subplots(rows=2, cols=1,  vertical_spacing=0.03,specs=[ [{"type": "table"}],[{"type": "scatter"}] ] )
+	fig.add_trace(go.Table(header=dict(values=table_col,font=dict(size=10),align="left"), cells=dict(values=table_row,  height=40,align="left")), row=1, col=1)
+	fig.add_trace(go.Scatter(x =df1[start:].index,y=df1[start:],mode='lines',name='Recorded trend 1'), row=2, col=1)
+	fig.add_trace(go.Scatter(x=give_dates(lastdate_1),y=show_predict1,mode='lines',name='Predicted trend 1',line=dict(width=4, dash='dot')), row=2, col=1)
+	fig.add_trace(go.Scatter(x = df2[start:].index, y=df2[start:], mode='lines', name='Recorded Trend 2'),  row=2, col=1)
+	fig.add_trace(go.Scatter(x=give_dates(lastdate_2), y=show_predict2, mode='lines', name='Predicted trend 2', line=dict(width=4, dash='dot')), row=2, col=1)
+	fig.update_yaxes(title_text="Paid Amount", row=2, col=1)
+	fig.update_xaxes(title_text='Dates', row=2, col=1)
+	fig.update_layout(title_text=table_title)
 
 	pio.write_html(fig, file='templates/output.html', auto_open=False)
 	return render_template('output.html')
@@ -145,7 +158,7 @@ def script():
 
 @app.route("/topNClients.html",  methods = ["POST", "GET"])
 def topNClients() :
-
+	
 	if request.method == 'POST' :
 		number = request.form['number']
 		criteria= request.form['criteria']
@@ -168,7 +181,7 @@ def topNClients() :
 				table_col.append(str(var))
 			table_col.append('Predicted Paid Amt Mean(USD)')
 			table_row = list()
-
+			
 			i=0
 			for key in final_result.keys():
 				x_bar.append(key)
@@ -203,14 +216,15 @@ def topNClients() :
 					for i in range(12) :
 						small_word+=word[i]
 					name_scatter.append(small_word+"...")
-
+			
 			fig = make_subplots(rows=3, cols=1,  vertical_spacing=0.09,specs=[ [{"type": "table"}],[{"type": "bar"}],[{"type": "scatter"}] ] )
 			fig.add_trace(go.Table(header=dict(values=table_col,font=dict(size=10),align="left"), cells=dict(values=new_table_row,  height=40,align="left")), row=1, col=1)
 			fig.add_trace(go.Bar(x=name_scatter, y=y_bar, text=x_bar,textposition='outside'), row=2, col=1)
 			fig.update_yaxes(title_text="Mean Prdicted Amt(USD)", row=2, col=1)
 			fig.update_yaxes(title_text="Predicted Paid Amt ", row=3, col=1)
 			fig.update_xaxes(title_text="Dates", row=3, col=1)
-
+			fig.update_layout(title_text="")
+			
 			i=0
 			for element_y in y_scatter:
 				fig.add_trace(go.Scatter(x=x_scatter, y=element_y, name=name_scatter[i]), row=3, col=1)
@@ -220,9 +234,9 @@ def topNClients() :
 		else :
 			comparareClientsTransaction(number, allClients)
 
-
+	
 		return render_template('topNClientsGraph.html')
-
+    
 
 	return render_template('topNClients.html', allClientsNumber=len(allClients))
 
@@ -234,4 +248,4 @@ def alter() :
 
 
 if __name__ == '__main__':
-      app.run(debug=True)
+      app.run(debug=True)    
