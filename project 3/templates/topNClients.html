@@ -19,10 +19,6 @@
 			margin-right:auto;
 			background-color: white;
 		}
-		button{
-			background-color: black;
-			color: white;
-		}
 	</style>
 
 	<script type="text/javascript">
@@ -71,6 +67,11 @@
 				  {% endfor %}
 			</select>
 			<br><br>
+			<label>Select the criteria to compare clients : </label>
+		    <select name = "criteria" >
+				   <option value= "Transaction" selected>Percentage of successful transaction</option>"
+				   <option value= "Mean" selected>Predicted Paid Amt Mean</option>"
+			</select>
 		<input class="button" type="submit" name="submit" value="Submit">
 	</form>
 	<br>
