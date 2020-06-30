@@ -10,8 +10,8 @@ def model_call(client_name, le_name):
     train = df.iloc[:-10, :]
     test = df.iloc[-10:, :]
     pred = test.copy()
-    model = ExponentialSmoothing(np.asarray(train['Paid Amount']), trend="add", seasonal="add", seasonal_periods=12)
-    model2 = ExponentialSmoothing(np.asarray(train['Paid Amount']), trend="add", seasonal="add", seasonal_periods=12, damped=True)
+    model = ExponentialSmoothing(np.asarray(train['Paid Amount']), trend="add", seasonal="add", seasonal_periods=6)
+    model2 = ExponentialSmoothing(np.asarray(train['Paid Amount']), trend="add", seasonal="add", seasonal_periods=6, damped=True)
     fit = model.fit()
     pred = fit.forecast(len(test))
     fit2 = model2.fit()
@@ -38,9 +38,9 @@ def predict_top_clients(num, forecast_num=6):
     model_dict = {}
 
     for client in df['Client Name'].unique():
-        model1 = ExponentialSmoothing(np.asarray(df[df['Client Name']==client]['Paid Amount']), trend='add', seasonal='add', seasonal_periods=12, damped=True)
+        model1 = ExponentialSmoothing(np.asarray(df[df['Client Name']==client]['Paid Amount']), trend='add', seasonal='add', seasonal_periods=6, damped=True)
         hw_model1 = model1.fit()
-        model2 = ExponentialSmoothing(np.asarray(df[df['Client Name']==client]['Paid Amount']), trend='add', seasonal='add', seasonal_periods=12)
+        model2 = ExponentialSmoothing(np.asarray(df[df['Client Name']==client]['Paid Amount']), trend='add', seasonal='add', seasonal_periods=6)
         hw_model2 = model2.fit()
         model_dict[client] = hw_model1 if hw_model1.aic < hw_model2.aic else hw_model2
 
