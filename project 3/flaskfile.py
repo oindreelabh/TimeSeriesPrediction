@@ -14,6 +14,8 @@ import datetime
 import numpy as np
 from helper_functions import give_last_date, take_fields, give_dates, give_clients_and_entities
 from forms import OutputForm
+import csv
+from successfulTransactionCompare import comparareClientsTransaction
 
 
 
@@ -28,7 +30,7 @@ allLegalEntities=allData[1]
 listofatt=take_fields()
 final_result = predict_top_clients(len(allClients))
 
-df = pd.read_csv(r'processed_data.csv')
+df = pd.read_csv(r'F:/try/processed_data.csv')
 d = {}
 for i in range(len(df)):
 	key = df.iloc[i,1]
@@ -94,7 +96,7 @@ def predict():
 	fig.update_layout(title_text=final_verdict)
 	fig.update_yaxes(title_text="Paid Amount")
 	fig.update_xaxes(title_text='Dates')
-	pio.write_html(fig, file='templates/predict.html', auto_open=False)
+	pio.write_html(fig, file='F:/try/templates/predict.html', auto_open=False)
 	return render_template('predict.html')
 	   
 
@@ -137,105 +139,90 @@ def script():
 	fig.update_yaxes(title_text="Paid Amount")
 	fig.update_xaxes(title_text='Dates')
 
-	pio.write_html(fig, file='templates/output.html', auto_open=False)
+	pio.write_html(fig, file='F:/try/templates/output.html', auto_open=False)
 	return render_template('output.html')
 
 
 @app.route("/topNClients.html",  methods = ["POST", "GET"])
 def topNClients() :
-	result = {}
-	
 	
 	if request.method == 'POST' :
-		x_bar = list()
-		name_scatter =[]
-		now_date=str(date.today())
-		new_now_date=""
-		for w in now_date :
-			if(w!='-') :
-				new_now_date+=w
-		x_scatter_temp = give_dates(new_now_date, 6)
-		x_scatter=x_scatter_temp[1:]
-		print(x_scatter)
-		print('<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
-		y_bar = list()
-		y_scatter = list()
-		table_col = list()
-		table_col.append('Clients')
-		for var in x_scatter :
-			table_col.append(str(var))
-		print(table_col)
-		print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
-		table_col.append('Predicted Paid Amt Mean(USD)')
-		table_row = list()
-		'''table_row_temp1 = list()
-		for key in final_result.keys() :
-			tabel_row_temp1.append(key)
-		tabel_row.append(tabel_row_temp1)'''
-		
-		#lename = request.form['lename']
 		number = request.form['number']
-		result['number']='number'
-		i=0
-		for key in final_result.keys():
-			#result[key]=final_result[key]
-			x_bar.append(key)
-			y_bar.append(int(final_result[key][0]))
-			table_row_temp=list()
-			table_row_temp.append(key)
-			y_scatter_temp = list()
-			j=1
-			while j < len(final_result[key]):
-				y_scatter_temp.append(final_result[key][j])
-				table_row_temp.append(final_result[key][j])
-				j=j+1
-			table_row_temp.append(final_result[key][0])
-			y_scatter.append(y_scatter_temp)
-			table_row.append(table_row_temp)
-			i=i+1
-			if i ==int(number) :
-				break
+		criteria= request.form['criteria']
 
-		print(table_row)
-		print('????????????????????????????????????????????????????????????????????????')
-		new_table_row = []
-		for i in range(len(table_row[0])):
-			table_row_temp_new = []
-			for elem in table_row :
-				table_row_temp_new.append(elem[i])
-			new_table_row.append(table_row_temp_new)
+		if criteria == 'Mean' :
+			x_bar = list()
+			name_scatter =[]
+			now_date=str(date.today())
+			new_now_date=""
+			for w in now_date :
+				if(w!='-') :
+					new_now_date+=w
+			x_scatter_temp = give_dates(new_now_date, 6)
+			x_scatter=x_scatter_temp[1:]
+			y_bar = list()
+			y_scatter = list()
+			table_col = list()
+			table_col.append('Clients')
+			for var in x_scatter :
+				table_col.append(str(var))
+			table_col.append('Predicted Paid Amt Mean(USD)')
+			table_row = list()
+			
+			i=0
+			for key in final_result.keys():
+				x_bar.append(key)
+				y_bar.append(int(final_result[key][0]))
+				table_row_temp=list()
+				table_row_temp.append(key)
+				y_scatter_temp = list()
+				j=1
+				while j < len(final_result[key]):
+					y_scatter_temp.append(final_result[key][j])
+					table_row_temp.append(final_result[key][j])
+					j=j+1
+				table_row_temp.append(final_result[key][0])
+				y_scatter.append(y_scatter_temp)
+				table_row.append(table_row_temp)
+				i=i+1
+				if i ==int(number) :
+					break
 
-		for word in x_bar:
-			if len(word) < 12:
-				name_scatter.append(word)
-			else :
-				small_word=""
-				for i in range(12) :
-					small_word+=word[i]
-				name_scatter.append(small_word+"...")
-		
-		fig = make_subplots(rows=3, cols=1,  vertical_spacing=0.09,specs=[ [{"type": "table"}],[{"type": "bar"}],[{"type": "scatter"}] ] )
-		fig.add_trace(go.Table(header=dict(values=table_col,font=dict(size=10),align="left"), cells=dict(values=new_table_row,  height=40,align="left")), row=1, col=1)
-		fig.add_trace(go.Bar(x=name_scatter, y=y_bar, text=x_bar,textposition='outside'), row=2, col=1)
-		fig.update_yaxes(title_text="Mean Prdicted Amt(USD)", row=2, col=1)
-		#fig.update_xaxes(title_text="Clients", row=2, col=1)
-		fig.update_yaxes(title_text="Predicted Paid Amt ", row=3, col=1)
-		fig.update_xaxes(title_text="Dates", row=3, col=1)
-		#fig.update_layout(uniformtext_minsize=8, uniformtext_mode='hide')
-		print(y_scatter)
-		print('LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL')
-		i=0
-		for element_y in y_scatter:
-			fig.add_trace(go.Scatter(x=x_scatter, y=element_y, name=name_scatter[i]), row=3, col=1)
-			i=i+1	
-		pio.write_html(fig, file='templates/topNClientsGraph.html')
+			new_table_row = []
+			for i in range(len(table_row[0])):
+				table_row_temp_new = []
+				for elem in table_row :
+					table_row_temp_new.append(elem[i])
+				new_table_row.append(table_row_temp_new)
+
+			for word in x_bar:
+				if len(word) < 12:
+					name_scatter.append(word)
+				else :
+					small_word=""
+					for i in range(12) :
+						small_word+=word[i]
+					name_scatter.append(small_word+"...")
+			
+			fig = make_subplots(rows=3, cols=1,  vertical_spacing=0.09,specs=[ [{"type": "table"}],[{"type": "bar"}],[{"type": "scatter"}] ] )
+			fig.add_trace(go.Table(header=dict(values=table_col,font=dict(size=10),align="left"), cells=dict(values=new_table_row,  height=40,align="left")), row=1, col=1)
+			fig.add_trace(go.Bar(x=name_scatter, y=y_bar, text=x_bar,textposition='outside'), row=2, col=1)
+			fig.update_yaxes(title_text="Mean Prdicted Amt(USD)", row=2, col=1)
+			fig.update_yaxes(title_text="Predicted Paid Amt ", row=3, col=1)
+			fig.update_xaxes(title_text="Dates", row=3, col=1)
+			
+			i=0
+			for element_y in y_scatter:
+				fig.add_trace(go.Scatter(x=x_scatter, y=element_y, name=name_scatter[i]), row=3, col=1)
+				i=i+1
+			pio.write_html(fig, file='F:/try/templates/topNClientsGraph.html')
+
+		else :
+			comparareClientsTransaction(number, allClients)
+
 	
-		print(result)
-		print('....................post result..............................')
 		return render_template('topNClientsGraph.html')
     
-	print(result)
-	print('....................result....................')
 
 	return render_template('topNClients.html', allClientsNumber=len(allClients))
 
