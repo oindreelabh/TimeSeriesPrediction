@@ -27,7 +27,7 @@ UI - Python Flask, HTML CSS, JavaScript, flask_wtf, plotly python
 
 ## MODEL INTEGRATION TO UI
 
-"project 3" folder contains the flaskfile.py file which is needed to run this application.
+"project 3" folder contains all the required files. The flaskfile.py should be run in order to view this application.
 All the modules present in TECHNOLOGY USED section should be pre-installed.
 
 <p align="center">
