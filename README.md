@@ -29,7 +29,3 @@ UI - Python Flask, HTML CSS, JavaScript, flask_wtf, plotly python
 
 "updated" folder contains all the required files. The flaskfile.py should be run in order to view this application.
 All the modules present in TECHNOLOGY USED section should be pre-installed.
-
-<p align="center">
-  For details on the models tried and tested, UI features and better understanding of system workflow, please refer to <a href="https://docs.google.com/document/d/1zDoQaWnT0mUfGLrbunjLIUqtAPevApgmvw2dFgixFj8/edit#heading=h.z6ne0og04bp5">this document</a>.
-</p>
